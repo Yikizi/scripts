@@ -3,8 +3,8 @@
 export WAYLAND_DISPLAY=wayland-1
 export XDG_RUNTIME_DIR=/run/user/1000
 
-prefix="/home/mattias/dirs/Documents/backgrounds/"
-file=$(ls "/home/mattias/dirs/Documents/backgrounds/" | shuf -n 1)
+prefix="/$HOME/dirs/Documents/backgrounds/"
+file=$(ls "/$HOME/dirs/Documents/backgrounds/" | shuf -n 1)
 pkill swaybg
 /usr/bin/swaybg -i "$prefix$file" && exit 0
 
