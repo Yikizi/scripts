@@ -23,6 +23,21 @@ def "main remove" [name: string] {
   | save -f $path
 }
 
+def "main close" [
+  --port (-p): string = "9222",
+  --filter (-f): string = ""
+] {
+  let bookmarks = (open $path | get url)
+  let tabs_json = (http get $"http://localhost:($port)/json/list"
+    | where type == page)
+  for tab in $tabs_json {
+    if not ($tab.url | str contains $filter) { continue }
+    if ($bookmarks | any {|it| $it == $tab.url} ) {
+      http get $"http://localhost:($port)/json/close/($tab.id)"
+    }
+  }
+}
+
 def "main open" [line: string] {
   let url = ($line | split column " " | get column1 | to text -n)
   vivaldi --new-tab $url # replace with your browser of choice
