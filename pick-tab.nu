@@ -6,7 +6,6 @@ def main [] {
   let lines = ($json | select url title | to csv -s " " -n)
   let cmd = "fzf.sh --history=/home/mattias/history/tabs.fzf --wrap --cycle --bind 'enter:execute-silent(wl-copy --primary {})+accept'"
   let result = (fzf-launch $lines $cmd | str trim)
-  print $result
   if $result == "130" { exit 0 }
   let url = (wl-paste --primary | split column " " | get column1 | to text -n)
   let id = ($json | where url == $url | get id | to text -n)
