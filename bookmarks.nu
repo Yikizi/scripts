@@ -40,9 +40,20 @@ def "main close" [
 
 def "main open" [line: string] {
   let url = ($line | split column " " | get column1 | to text -n)
-  vivaldi --new-tab $url # replace with your browser of choice
+  if not (main check-if-open $url) {
+    vivaldi --new-tab $url # replace with your browser of choice
+  }
   swaymsg '[app_id="vivaldi-stable"]' focus
   main increment $url
+}
+
+def "main check-if-open" [url: string]: string -> bool {
+  let tabs = (http get "http://localhost:9222/json/list" | select url id)
+  if ($tabs | any {|it| $it.url == $url}) {
+    http get $"http://localhost:9222/json/activate/($tabs | where url == $url | get id | to text -n | str trim)"
+    return true
+  }
+  return false
 }
 
 def "main increment" [url: string] {
@@ -58,7 +69,7 @@ def "main increment" [url: string] {
 
 def "main list" [] {
   let data = (open $path | sort-by clicks | reject clicks | to csv -s ' ' -n)
-  let cmd = "fzf --cycle --bind 'ctrl-t:execute(nu ~/dotfiles/sway/scripts/bookmarks.nu tag {}),enter:execute-silent(~/dotfiles/sway/scripts/bookmarks.nu open {})+abort'"
+  let cmd = "fzf --cycle --bind 'ctrl-t:execute(nu ~/dotfiles/sway/scripts/bookmarks.nu tag {}),enter:execute-silent(~/dotfiles/sway/scripts/bookmarks.nu open {})+abort,alt-e:execute(nvim ~/dotfiles/sway/scripts/bookmarks.json)'"
   fzf-launch $data $cmd
 }
 
