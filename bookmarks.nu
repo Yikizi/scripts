@@ -69,7 +69,7 @@ def "main increment" [url: string] {
 
 def "main list" [] {
   let data = (open $path | sort-by clicks | reject clicks | to csv -s ' ' -n)
-  let cmd = "fzf --cycle --bind 'ctrl-t:execute(nu ~/dotfiles/sway/scripts/bookmarks.nu tag {}),enter:execute-silent(~/dotfiles/sway/scripts/bookmarks.nu open {})+abort,alt-e:execute(nvim ~/dotfiles/sway/scripts/bookmarks.json)'"
+  let cmd = "fzf.sh --history=/home/mattias/history/bookmarks.fzf --preview='' --wrap --cycle --bind 'ctrl-t:execute(nu ~/dotfiles/sway/scripts/bookmarks.nu tag {}),enter:execute-silent(~/dotfiles/sway/scripts/bookmarks.nu open {})+abort,alt-e:execute(nvim ~/dotfiles/sway/scripts/bookmarks.json)'"
   fzf-launch $data $cmd
 }
 
