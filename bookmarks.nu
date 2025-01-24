@@ -2,6 +2,7 @@
 
 # NOTE: to get started, simply add a bookmark
 
+use my-utils.nu fzf-launch
 let path = $"($env.HOME)/dotfiles/sway/scripts/bookmarks.json"
 
 def "main add" [name: string] {
@@ -42,8 +43,8 @@ def "main increment" [url: string] {
 
 def "main list" [] {
   let data = (open $path | sort-by clicks | reject clicks | to csv -s ' ' -n)
-  let cmd = "fzf --bind 'ctrl-t:execute(nu ~/dotfiles/sway/scripts/bookmarks.nu tag {}),enter:execute-silent(~/dotfiles/sway/scripts/bookmarks.nu open {})+abort'"
-  foot -T fzf-launcher -e tmux -c $"echo '($data)' | ($cmd)"
+  let cmd = "fzf --cycle --bind 'ctrl-t:execute(nu ~/dotfiles/sway/scripts/bookmarks.nu tag {}),enter:execute-silent(~/dotfiles/sway/scripts/bookmarks.nu open {})+abort'"
+  fzf-launch $data $cmd
 }
 
 def "main tag" [url: string] {
