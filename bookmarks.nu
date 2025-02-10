@@ -47,7 +47,7 @@ def "main open" [line: string] {
   main increment $url
 }
 
-def "main check-if-open" [url: string]: string -> bool {
+def "main check-if-open" [url: string] {
   let tabs = (http get "http://localhost:9222/json/list" | select url id)
   if ($tabs | any {|it| $it.url == $url}) {
     http get $"http://localhost:9222/json/activate/($tabs | where url == $url | get id | to text -n | str trim)"
