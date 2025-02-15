@@ -5,7 +5,7 @@
 use my-utils.nu fzf-launch
 let path = $"($env.HOME)/dotfiles/sway/scripts/bookmarks.json"
 
-def "main add" [name: string] {
+def "bm add" [name: string] {
   let bookmark = {
     "url": $name,
     "clicks": 0,
@@ -17,13 +17,13 @@ def "main add" [name: string] {
   | save -f $path
 }
 
-def "main remove" [name: string] {
+def "bm remove" [name: string] {
   open $path
   | where url != $name | collect
   | save -f $path
 }
 
-def "main close" [
+def "bm close" [
   --port (-p): string = "9222",
   --filter (-f): string = ""
 ] {
@@ -38,16 +38,16 @@ def "main close" [
   }
 }
 
-def "main open" [line: string] {
+def "bm open" [line: string] {
   let url = ($line | split column " " | get column1 | to text -n)
-  if not (main check-if-open $url) {
+  if not (bm check-if-open $url) {
     vivaldi --new-tab $url # replace with your browser of choice
   }
   swaymsg '[app_id="vivaldi-stable"]' focus
-  main increment $url
+  bm increment $url
 }
 
-def "main check-if-open" [url: string] {
+def "bm check-if-open" [url: string] {
   let tabs = (http get "http://localhost:9222/json/list" | select url id)
   if ($tabs | any {|it| $it.url == $url}) {
     http get $"http://localhost:9222/json/activate/($tabs | where url == $url | get id | to text -n | str trim)"
@@ -56,7 +56,7 @@ def "main check-if-open" [url: string] {
   return false
 }
 
-def "main increment" [url: string] {
+def "bm increment" [url: string] {
   open $path | each {|it|
     if $it.url == $url {
       let new_it = ($it | update clicks ($it.clicks + 1))
@@ -67,13 +67,13 @@ def "main increment" [url: string] {
   } | collect | save -f $path
 }
 
-def "main list" [] {
+def "bm list" [] {
   let data = (open $path | sort-by clicks | reject clicks | to csv -s ' ' -n)
   let cmd = "fzf.sh --history=/home/mattias/history/bookmarks.fzf --preview='' --wrap --cycle --bind 'ctrl-t:execute(nu ~/dotfiles/sway/scripts/bookmarks.nu tag {}),enter:execute-silent(~/dotfiles/sway/scripts/bookmarks.nu open {})+abort,alt-e:execute(nvim ~/dotfiles/sway/scripts/bookmarks.json)'"
   fzf-launch $data $cmd
 }
 
-def "main tag" [url: string] {
+def "bm tag" [url: string] {
   let tag = (input "Tag: ")
   let url = ($url | split column " " | select 0 | get column1 | to text | str trim)
   open $path | each {|it|
@@ -86,6 +86,6 @@ def "main tag" [url: string] {
   } | collect | save -f $path
 }
 
-def main [] {
+def bm [] {
   print "main function called"
 }
